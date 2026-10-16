@@ -1,0 +1,42 @@
+{
+  "name": "@masonf539/game-package-template",
+  "version": "0.1.0",
+  "description": "Private starter template for independently packaged GameHub games.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "public",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "clean:test": "node -e \"require('node:fs').rmSync('dist-test',{recursive:true,force:true})\"",
+    "build": "npm run clean && tsc",
+    "build:test": "npm run clean:test && tsc -p tsconfig.test.json",
+    "check": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "test": "npm run build:test && node --test dist-test/*.test.js",
+    "prepack": "npm run build"
+  },
+  "private": true,
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@masonf539/game-sdk": "1.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "typescript": "^7.0.2"
+  }
+}
