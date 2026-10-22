@@ -10,6 +10,23 @@ authoritative rules and state, public viewer state, browser markup and styles,
 game actions, game-specific assets, and tests. It does not need its own
 `index.html` or Socket.IO connection.
 
+## Game design
+
+Fill in [docs/design.md](docs/design.md) before replacing the starter game.
+Replace its square-bracketed placeholders, including the brackets, with your
+answers. Longer placeholders explain what to describe; italic group notes can
+be removed after completing their fields. The
+document follows Egyptian War's game-focused structure: overview, mechanics,
+information visibility, settings, offline behavior, scores, layout, and pacing.
+Fill in [docs/implementation.md](docs/implementation.md) as technical decisions
+are made. It provides bracketed prompts for source responsibilities, internal
+state, actions, timers, reconnects, SDK services, cleanup, and verification.
+The final playtest section of the design document is optional; detailed
+playtest results belong in separate notes.
+Keep it current as the game is implemented; distinguish intended behavior from
+verified features. Both documents are copied with this template and included
+in the package's `docs` directory when packed.
+
 ## Create a game
 
 1. Copy this directory into a new repository without its generated `dist`,
