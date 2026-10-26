@@ -13,7 +13,7 @@ export const starterGameDefinition = {
   isPlayable: true,
   chatEnabled: false,
   rules: [
-    "Players take turns scoring points.",
+    "Players score points using the Score point action.",
     "The first player to reach the target score wins.",
     "Spectators can follow the score but cannot submit actions."
   ],

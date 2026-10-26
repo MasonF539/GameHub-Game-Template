@@ -41,13 +41,15 @@ function createHarness(targetScore = 3): {
   events: GameEvent[];
   completions: GameCompletion[];
   broadcasts: () => number;
+  members: GameMember[];
 } {
+  const currentMembers = members.map(member => ({ ...member }));
   const events: GameEvent[] = [];
   const completions: GameCompletion[] = [];
   let broadcastCount = 0;
   const context: GameSessionContext = {
     roomCode: "ABC123",
-    members: () => members,
+    members: () => currentMembers,
     broadcastState: () => { broadcastCount += 1; },
     emitEvent: (event) => { events.push(event); },
     finish: (completion) => { completions.push(completion); },
@@ -58,6 +60,7 @@ function createHarness(targetScore = 3): {
     session: new StarterGameSession(context, { targetScore }),
     events,
     completions,
+    members: currentMembers,
     broadcasts: () => broadcastCount
   };
 }
@@ -119,4 +122,40 @@ test("supports the shared pause lifecycle", () => {
   );
   assert.equal(session.resume().success, true);
   assert.equal(session.getLifecycleState().isPaused, false);
+});
+
+test("reconnecting with a new id preserves points and retires the old id", () => {
+  const { session, members } = createHarness(10);
+  assert.equal(session.handleAction("player-1", { type: "score-point" }).success, true);
+  const member = members.find(member => member.id === "player-1")!;
+  member.isConnected = false;
+  session.memberDisconnected();
+  member.id = "returned-player";
+  member.isConnected = true;
+  session.memberReconnected("returned-player", "player-1");
+  const state = session.getPublicState({ memberId: member.id, role: "player" });
+  assert.equal(state.scores.find(player => player.id === member.id)?.score, 1);
+  assert.equal(session.handleAction("player-1", { type: "score-point" }).success, false);
+  assert.equal(session.handleAction(member.id, { type: "score-point" }).success, true);
+  session.memberReconnected(member.id);
+  assert.equal(session.getPublicState({ memberId: member.id, role: "player" })
+    .scores.find(player => player.id === member.id)?.score, 2);
+});
+
+test("disconnected players cannot score", () => {
+  const { session, members, events } = createHarness();
+  members.find(member => member.id === "player-1")!.isConnected = false;
+  assert.equal(session.getPublicState({ memberId: "player-1", role: "player" }).canScore, false);
+  assert.equal(session.handleAction("player-1", { type: "score-point" }).success, false);
+  assert.equal(events.length, 0);
+});
+
+test("disposed sessions cannot advertise scoring or change pause state", () => {
+  const { session, broadcasts } = createHarness();
+  session.dispose();
+  const before = broadcasts();
+  assert.equal(session.getPublicState({ memberId: "player-1", role: "player" }).canScore, false);
+  assert.equal(session.pause().success, false);
+  assert.equal(session.resume().success, false);
+  assert.equal(broadcasts(), before);
 });

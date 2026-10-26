@@ -33,11 +33,12 @@
   "engines": {
     "node": ">=20"
   },
-  "dependencies": {
-    "@masonf539/game-sdk": "1.0.1"
-  },
   "devDependencies": {
+    "@masonf539/game-sdk": "1.0.1",
     "@types/node": "^26.6.4",
     "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "@masonf539/game-sdk": "^1.0.1 || ^1.1.0-beta.0"
   }
 }

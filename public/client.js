@@ -10,6 +10,8 @@
 
       let latestState = null;
       let isSubmitting = false;
+      let isDestroyed = false;
+      actionButton.disabled = true;
 
       function render() {
         if (!latestState) return;
@@ -37,10 +39,11 @@
       }
 
       async function scorePoint() {
-        if (actionButton.disabled) return;
+        if (isDestroyed || actionButton.disabled) return;
         isSubmitting = true;
         render();
         const result = await context.submitAction({ type: "score-point" });
+        if (isDestroyed) return;
         isSubmitting = false;
         if (!result.success && result.message) context.notify(result.message);
         render();
@@ -65,6 +68,7 @@
           render();
         },
         destroy() {
+          isDestroyed = true;
           unsubscribe();
           actionButton.removeEventListener("click", scorePoint);
           scores.replaceChildren();

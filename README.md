@@ -29,8 +29,8 @@ in the package's `docs` directory when packed.
 
 ## Create a game
 
-1. Copy this directory into a new repository without its generated `dist`,
-   `dist-test`, or `node_modules` directories.
+1. Copy this directory into a new repository without its `.git` directory or
+   generated `dist`, `dist-test`, and `node_modules` directories.
 2. Replace `@masonf539/game-package-template`, `starter-game`, `Starter Game`,
    and the example descriptions with the real package and game identity.
 3. Change both the package version and `packageVersion` in
@@ -71,3 +71,19 @@ npm install --save-exact @your-scope/your-game@1.0.0
 
 Then add the package name to `gamehub.config.json`. GameHub validates the
 manifest and declared files during startup and its Docker package check.
+
+
+## Starter lifecycle and SDK compatibility
+
+The placeholder score race preserves points when reconnecting changes a player's
+socket ID and rejects scoring from disconnected members. Its browser client
+ignores action replies after unmount and disables the reused action button until
+the first state snapshot arrives. Server and browser regression tests cover these
+cases. Disposed sessions cannot advertise scoring or accept pause/resume.
+These checks verify the starter implementation, not planned game rules.
+
+The SDK is a compatible peer dependency, so an installed game shares GameHub's
+SDK instead of installing its own runtime copy. SDK 1.0.1 remains pinned as a
+development dependency for standalone type checks and tests. The peer range also
+accepts GameHub's current 1.1.0 prerelease; newer optional services must be checked
+before use.

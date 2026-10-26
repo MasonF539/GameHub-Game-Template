@@ -67,6 +67,7 @@ export class StarterGameSession implements GameSession {
       isPaused: this.#isPaused,
       canScore:
         viewer.role === "player" &&
+        !this.#isDisposed &&
         this.#winnerId === null &&
         !this.#isPaused &&
         members.some(
@@ -97,7 +98,7 @@ export class StarterGameSession implements GameSession {
     }
 
     const player = this.#context.members().find(
-      (member) => member.id === memberId && member.role === "player"
+      (member) => member.id === memberId && member.role === "player" && member.isConnected
     );
     if (!player) {
       return { success: false, message: "Only active players can score." };
@@ -125,7 +126,7 @@ export class StarterGameSession implements GameSession {
   }
 
   pause(): GameActionResult {
-    if (this.#winnerId !== null) {
+    if (this.#isDisposed || this.#winnerId !== null) {
       return { success: false, message: "This game has already finished." };
     }
     this.#isPaused = true;
@@ -134,7 +135,7 @@ export class StarterGameSession implements GameSession {
   }
 
   resume(): GameActionResult {
-    if (this.#winnerId !== null) {
+    if (this.#isDisposed || this.#winnerId !== null) {
       return { success: false, message: "This game has already finished." };
     }
     this.#isPaused = false;
@@ -146,7 +147,12 @@ export class StarterGameSession implements GameSession {
     this.#context.broadcastState();
   }
 
-  memberReconnected(): void {
+  memberReconnected(memberId: string, previousMemberId = memberId): void {
+    if (previousMemberId !== memberId && this.#scores.has(previousMemberId)) {
+      this.#scores.set(memberId, this.#scores.get(previousMemberId)!);
+      this.#scores.delete(previousMemberId);
+      if (this.#winnerId === previousMemberId) this.#winnerId = memberId;
+    }
     this.#context.broadcastState();
   }
 
