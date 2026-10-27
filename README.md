@@ -87,3 +87,10 @@ SDK instead of installing its own runtime copy. SDK 1.0.1 remains pinned as a
 development dependency for standalone type checks and tests. The peer range also
 accepts GameHub's current 1.1.0 prerelease; newer optional services must be checked
 before use.
+
+
+## Node versions
+
+Use Node 24 for development and verification, matching CI. The Node >=20 engine
+range describes the game package's production runtime; it does not promise that
+all development dependencies support Node 20.
